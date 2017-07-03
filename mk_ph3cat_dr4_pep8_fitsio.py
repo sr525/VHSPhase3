@@ -47,16 +47,18 @@ def file_supercede(dir1, dir2):
     files_both = list(set(files1) & set(files2))
 
     same = 0
+    diff_files = []
     for file in files_both:
         if file[-5:] == ".fits":
             fh1 = fits.open(dir1 + file)
             fh2 = fits.open(dir2 + file)
             if fh1[1].header["DATASUM"] <> fh2[1].header["DATASUM"]:
-                print file
+                diff_files.append(file)
             else:
                 same += 1
     print "Number of files that have the same datasum:", same, "out of", len(files1), "/", len(files2)
 
+    return diff_files
 
 def check_prodcatg(path):
     """
