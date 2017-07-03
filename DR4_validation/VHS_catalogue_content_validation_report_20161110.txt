@@ -1,0 +1,100 @@
+From: Laura Mascetti <lmascett@partner.eso.org>
+Subject: VHS catalogue content validation report
+Date: 10 November 2016 08:29:00 GMT
+To: Richard McMahon <rgm@ast.cam.ac.uk>, epons@ast.cam.ac.uk, Sophie Reed <sr525@ast.cam.ac.uk>
+Cc: "asg@eso.org" <asg@eso.org>
+
+Dear Richard,
+
+Please find below the content validation report for the VHS catalogue
+submission (batch_1597). Some checks are still pending, so this report
+is preliminary.
+
+1) You should also submit the CHANGES.USER file
+indicating which tiles update the previous versions
+Here is an example on how to record the relationships between old and
+new files in the CHANGES.USER file:
+fs472446411477_v20100702_00272_469403.fits UPDATES
+fs472446403411_v20100702_00272_469403.fits
+fs472446411476_v20110528_00334_498134.fits UPDATES
+fs472446404599_v20110528_00334_498134.fits
+...
+
+2) SKYSQDEG =1 for the meta catalogue, this value is fine for the tile
+catalogues, but it should be the total area covered for the meta
+catalogue.
+
+3) Issue with FILTER keywords.
+for the meta catalogue, I think
+FILTER4 ='H' is missing
+
+dfits ph3_mcatalog.fits | grep FILTER
+FILTER1 = 'Y       '
+FILTER2 = 'J       '
+FILTER3 = 'Ks      '
+FILTER  = 'MULTI   '
+
+For the tile catalogues FILTER='MULTI' is missing:
+
+dfits fs472446411477_v20100702_00272_469403.fits | grep FILTER
+FILTER1 = 'Y       '
+FILTER2 = 'J       '
+FILTER3 = 'H       '
+FILTER4 = 'Ks      '
+
+4) OBJECT should not be present in the meta catalogue.
+$ dfits ph3_mcatalog.fits | grep OBJECT
+OBJECT  = 'DR4_472446404961'
+
+In the tile catalogues OBJECT should not contain the 'DR4_' string
+
+5) PROG_ID is always missing the run
+dfits fs472446411477_v20100702_00272_469403.fits | grep PROG
+PROG_ID = '179.A-2010'
+
+but it should be
+PROG_ID = '179.A-2010(A)'
+
+or in case of more runs involved:
+PROG_ID = 'MULTI'
+PROGID1 = '179.A-2010(A)'
+PROGID2 ='179.A-2010(B)'
+...
+
+6) MJD-OBS and MJD-END seem not to be precise.
+For example for file
+fs472446402561_v20150723_01039_1230021.fits
+we have
+MJD-OBS =        55182.0785057
+MJD-END =        57227.3137996
+
+and the provenance are
+PROV1   = 'v20150723_01051_st_tl_cat.fits',
+MJD-OBS = 57227.31380, MJD-END = 57227.31729
+
+PROV2   = 'v20150723_01039_st_tl_cat.fits',
+MJD-OBS=  57227.30965, MJD-END = 57227.31336
+
+so for the catalogue tile, it should be
+MJD-OBS = 57227.30965
+MJD-END = 57227.31729
+
+7) Regarding the TUCDi keywords,
+they lack in precision and in describing the physical quantity they
+refer to,
+for example:
+TUCD40= 'em.IR.NIR' -> 'phot.mag;em.IR.NIR'
+TUCD41= 'stat.error' -> 'stat.error;em.IR.NIR'
+TUCD18  = 'phot.color' -> 'phot.color;em.IR.J;em.IR.K'
+
+In the previous version of the catalogue these are fine, you could have
+a look at them.
+
+8) You should consider to make use of the keywords TINDXi,
+setting this flag TRUE signifies that this parameter is considered
+important for searching and defining subsamples of data.
+Based on this input a database index may be defined for this parameter
+to make database queries efficient.
+
+Kind regards,
+Laura
